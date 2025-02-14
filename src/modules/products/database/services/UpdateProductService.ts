@@ -8,7 +8,7 @@ interface IUpdateProduct {
   price: number;
   quantity: number;
 }
-export default class ShowProductService {
+export default class UpdateProductService {
   async execute({
     id,
     name,
