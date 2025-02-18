@@ -11,7 +11,6 @@ export default class DeleteProductService {
         if (!product) {
           throw new AppError('Product not found', 404);
         }
-
         await productRepositories.remove(product);
   }
 }
