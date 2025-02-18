@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
+import 'express-async-errors'; // Não remova, é necessário para lidar com erros assíncronos
 import 'reflect-metadata';
-import 'express-async-errors';
 import cors from 'cors';
 
 import routes from './routes';
@@ -12,13 +12,11 @@ AppDataSource.initialize()
   .then(async () => {
     const app = express();
 
-    app.use(express.json());
     app.use(cors());
-    app.use(routes);
+    app.use(express.json());
 
-    app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-      ErrorHandleMiddleware.handleError(err, req, res, next);
-    });
+    app.use(routes);
+    app.use(ErrorHandleMiddleware.handleError);
 
     console.log('Connected to database!');
 

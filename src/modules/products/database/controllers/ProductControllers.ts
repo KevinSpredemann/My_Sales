@@ -1,25 +1,25 @@
+import { NextFunction, Request, Response } from 'express';
 import ListProductService from '../services/ListProductService';
-import { Request, Response } from 'express';
 import ShowProductService from '../services/ShowProductService';
 import CreateProductService from '../services/CreateProductService';
 import DeleteProductService from '../services/DeleteProductService';
 import UpdateProductService from '../services/UpdateProductService';
 
-export default class ProductControllers {
+export default class ProductsControllers {
   async index(request: Request, response: Response): Promise<Response> {
     const listProductsService = new ListProductService();
     const product = await listProductsService.execute();
     return response.json(product);
   }
 
-  public async show(request: Request, response: Response): Promise<Response> {
+  async show(request: Request, response: Response): Promise<Response> {
     const { id } = request.params;
     const showProductService = new ShowProductService();
     const product = await showProductService.execute({ id });
     return response.json(product);
   }
 
-  public async create(request: Request, response: Response): Promise<Response> {
+  async create(request: Request, response: Response): Promise<Response> {
     const { name, price, quantity } = request.body;
     const createProductService = new CreateProductService();
     const product = await createProductService.execute({
@@ -30,7 +30,7 @@ export default class ProductControllers {
     return response.json(product);
   }
 
-  public async update(request: Request, response: Response): Promise<Response> {
+  async update(request: Request, response: Response): Promise<Response> {
     const { id } = request.params;
     const { name, price, quantity } = request.body;
     const updateProductService = new UpdateProductService();
@@ -43,10 +43,10 @@ export default class ProductControllers {
     return response.json(product);
   }
 
-  public async delete(request: Request, response: Response): Promise<Response> {
-    const { id } = request.params;
+  async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const { id } = req.params;
     const deleteProductService = new DeleteProductService();
     await deleteProductService.execute({ id });
-    return response.status(204).send([]);
+    res.status(204).send([]);
   }
 }

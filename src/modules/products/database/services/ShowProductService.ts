@@ -1,4 +1,3 @@
-import { Interface } from 'readline';
 import { Product } from '../entities/Products';
 import { productRepositories } from '../repositories/ProductsRepositories';
 import AppError from '@shared/errors/AppError';
