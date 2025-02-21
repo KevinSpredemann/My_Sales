@@ -1,5 +1,5 @@
 import { Router } from "express";
-import UserController from "../controllers/UserController";
+import UserController from "../controllers/UsersControllers";
 import { createUserSchema } from "../schemas/UserSchema";
 import AuthMiddleware from "@shared/middlewares/authMiddleware";
 
