@@ -6,7 +6,7 @@ interface IShowService {
   id: number;
 }
 
-export default class CreateCostumerService {
+export default class ShowCostumerService {
   public async execute({ id }: IShowService): Promise<Costumer> {
     const costumer = await costumerRepositories.findById(id);
 
