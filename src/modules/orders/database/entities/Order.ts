@@ -1,6 +1,14 @@
-import { Costumer } from "@modules/costumers/database/entities/Costumer";
-import { CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-
+import { Costumer } from '@modules/costumers/database/entities/Costumer';
+import {
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { OrdersProducts } from './OrdersProducts';
 
 @Entity('orders')
 export class Order {
@@ -9,11 +17,16 @@ export class Order {
 
   @ManyToOne(() => Costumer)
   @JoinColumn({ name: 'costumer_id' })
-  costumer: Costumer
+  costumer: Costumer;
+
+  @OneToMany(() => OrdersProducts, order_products => order_products.order, {
+    cascade: true,
+  })
+  order_products: OrdersProducts[];
 
   @CreateDateColumn()
-  created_at: Date
+  created_at: Date;
 
   @UpdateDateColumn()
-  updated_at: Date
+  updated_at: Date;
 }
