@@ -3,7 +3,7 @@ import { Order } from "./Order";
 import { Product } from "@modules/products/database/entities/Products";
 
 
-@Entity('orders_products')
+@Entity('order_products')
 export class OrdersProducts {
     @PrimaryGeneratedColumn()
     id: number;
