@@ -1,6 +1,7 @@
 import AppError from '@shared/errors/AppError';
 import { Product } from '../entities/Products';
 import { productRepositories } from '../repositories/ProductsRepositories';
+import RedisCache from '@shared/cache/rediscache';
 
 interface ICreateProduct {
   name: string;
@@ -10,6 +11,8 @@ interface ICreateProduct {
 
 export default class CreateProductService {
   async execute({ name, price, quantity }: ICreateProduct): Promise<Product> {
+
+    const redisCache = new RedisCache();
     const productExists = await productRepositories.findByName(name);
 
     if (productExists) {
@@ -23,6 +26,8 @@ export default class CreateProductService {
     });
 
     await productRepositories.save(product);
+
+    await redisCache.invalidate('products-list');
 
     return product;
   }

@@ -1,6 +1,7 @@
 import AppError from '@shared/errors/AppError';
 import { Product } from '../entities/Products';
 import { productRepositories } from '../repositories/ProductsRepositories';
+import RedisCache from '@shared/cache/rediscache';
 
 interface IUpdateProduct {
   id: string;
@@ -15,6 +16,9 @@ export default class UpdateProductService {
     price,
     quantity,
   }: IUpdateProduct): Promise<Product> {
+
+    const redisCache = new RedisCache();
+
     const product = await productRepositories.findById(id);
 
     if (!product) {
@@ -32,6 +36,8 @@ export default class UpdateProductService {
     product.quantity = quantity;
 
     await productRepositories.save(product);
+
+    await redisCache.invalidate('products-list');
 
     return product;
   }
