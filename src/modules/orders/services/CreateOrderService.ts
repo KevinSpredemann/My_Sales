@@ -1,9 +1,9 @@
-import { costumerRepositories } from '@modules/costumers/database/repositories/CostumerRepositories';
-import { Product } from '@modules/products/database/entities/Products';
-import { productRepositories } from '@modules/products/database/repositories/ProductsRepositories';
+import costumerRepository from '@modules/costumers/infra/database/repositories/CostumerRepositories';
+import { Product } from '@modules/products/infra/database/entities/Products';
+import { productRepositories } from '@modules/products/infra/database/repositories/ProductsRepositories';
 import AppError from '@shared/errors/AppError';
-import { Order } from '../database/entities/Order';
-import { orderRepositories } from '../database/repositories/OrderRepositories';
+import { Order } from '../infra/database/entities/Order';
+import { orderRepositories } from '../infra/database/repositories/OrderRepositories';
 
 interface ICreateOrder {
   costumer_id: string;
@@ -12,16 +12,9 @@ interface ICreateOrder {
 
 export default class createOrderService {
   async execute({ costumer_id, products }: ICreateOrder): Promise<Order> {
-    const costumerExists = await costumerRepositories.findById(
+    const costumer = await costumerRepository.findById(
       Number(costumer_id),
     );
-
-    if (!costumerExists) {
-      throw new AppError(
-        'Costumer not find any costumer with thr given id.',
-        404,
-      );
-    }
 
     const existentProducts = await productRepositories.findAllIds(products);
 
@@ -62,7 +55,7 @@ export default class createOrderService {
     }));
 
     const order = await orderRepositories.createOrder({
-      costumer: costumerExists,
+      costumer: costumer as any,
       products: serializedProducts,
     });
 
@@ -78,6 +71,5 @@ export default class createOrderService {
     await productRepositories.save(updatedProductQuantity);
 
     return order;
-
   }
 }

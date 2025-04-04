@@ -1,6 +1,7 @@
 import AppError from '@shared/errors/AppError';
-import { costumerRepositories } from '../database/repositories/CostumerRepositories';
-import { Costumer } from '../database/entities/Costumer';
+
+import { Costumer } from '../infra/database/entities/Costumer';
+import { ICostumerRepository } from '../domain/repositories/ICostumersRepositories';
 
 interface ICreateCostumer {
   id: number;
@@ -9,18 +10,19 @@ interface ICreateCostumer {
 }
 
 export default class UpdateCostumerService {
+  constructor(private readonly costumerRepository: ICostumerRepository) {}
   public async execute({
     id,
     name,
     email,
   }: ICreateCostumer): Promise<Costumer> {
-    const costumer = await costumerRepositories.findById(id);
+    const costumer = await this.costumerRepository.findById(id);
 
     if (!costumer) {
       throw new AppError('Costumer not found', 404);
     }
 
-    const costumerExists = await costumerRepositories.findByEmail(email);
+    const costumerExists = await this.costumerRepository.findByEmail(email);
 
     if (costumerExists && email !== costumer.email) {
       throw new AppError('There is already one costumer with this email', 409);
@@ -29,8 +31,8 @@ export default class UpdateCostumerService {
     costumer.name = name;
     costumer.email = email;
 
-    await costumerRepositories.save(costumer);
-    
+    await this.costumerRepository.save(costumer);
+
     return costumer;
   }
 }
