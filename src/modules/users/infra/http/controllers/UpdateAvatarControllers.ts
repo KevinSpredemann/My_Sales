@@ -1,15 +1,18 @@
 import { Request, Response } from 'express';
-import updateUserAvatarService from '../../../services/updateUserAvatarService';
+import { instanceToInstance } from 'class-transformer';
 
-export default class UpdateAvatarControllers {
-  async update(request: Request, response: Response): Promise<Response> {
-    const updateAvatarService = new updateUserAvatarService();
+import { container } from 'tsyringe';
+import UpdateUserAvatarService from '@modules/users/services/UpdateProfileService';
 
-    const user = await updateAvatarService.execute({
-      userId: Number(request.user.id),
-      avatarFilename: request.file?.filename as string,
+export default class UserAvatarController {
+  public async update(request: Request, response: Response): Promise<Response> {
+    const updateUserAvatar = container.resolve(UpdateUserAvatarService);
+
+    const user = await updateUserAvatar.execute({
+      userId: request.user.id,
+      avatarFileName: request.file?.filename as string,
     });
 
-    return response.json(user);
+    return response.json(instanceToInstance(user));
   }
 }

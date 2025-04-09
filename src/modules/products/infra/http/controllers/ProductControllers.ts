@@ -1,52 +1,70 @@
-import { NextFunction, Request, Response } from 'express';
-import ListProductService from '../../../services/ListProductService';
-import ShowProductService from '../../../services/ShowProductService';
-import CreateProductService from '../../../services/CreateProductService';
-import DeleteProductService from '../../../services/DeleteProductService';
-import UpdateProductService from '../../../services/UpdateProductService';
+import { Request, Response } from 'express';
+import ShowProductService from '@modules/products/services/ShowProductService';
+import UpdateProductService from '@modules/products/services/UpdateProductService';
+import DeleteProductService from '@modules/products/services/DeleteProductService';
+import { container } from 'tsyringe';
+import ListProductService from '@modules/products/services/ListProductService';
+import { CreateProductService } from '@modules/products/services/CreateProductService';
 
-export default class ProductsControllers {
-  async index(request: Request, response: Response): Promise<Response> {
-    const listProductsService = new ListProductService();
-    const product = await listProductsService.execute();
-    return response.json(product);
+export default class ProductsController {
+  public async index(request: Request, response: Response): Promise<Response> {
+    const { page, skip, take } = request.query;
+    const listProductsService = container.resolve(ListProductService);
+    const products = await listProductsService.execute({
+      page: Number(page),
+      skip: Number(skip),
+      take: Number(take),
+    });
+
+    return response.json(products);
   }
 
-  async show(request: Request, response: Response): Promise<Response> {
-    const { id } = request.params;
-    const showProductService = new ShowProductService();
-    const product = await showProductService.execute({ id });
-    return response.json(product);
+  public async show(request: Request, response: Response): Promise<Response> {
+    const id = Number(request.params.id);
+    const showProductService = container.resolve(ShowProductService);
+
+    const products = await showProductService.execute({ id});
+
+    return response.json(products);
   }
 
-  async create(request: Request, response: Response): Promise<Response> {
+  public async create(request: Request, response: Response): Promise<Response> {
     const { name, price, quantity } = request.body;
-    const createProductService = new CreateProductService();
+
+    const createProductService = container.resolve(CreateProductService);
+
     const product = await createProductService.execute({
       name,
       price,
       quantity,
     });
+
     return response.json(product);
   }
 
-  async update(request: Request, response: Response): Promise<Response> {
+  public async update(request: Request, response: Response): Promise<Response> {
     const { id } = request.params;
     const { name, price, quantity } = request.body;
-    const updateProductService = new UpdateProductService();
+
+    const updateProductService = container.resolve(UpdateProductService);
+
     const product = await updateProductService.execute({
       id,
       name,
       price,
       quantity,
     });
+
     return response.json(product);
   }
 
-  async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
-    const { id } = req.params;
-    const deleteProductService = new DeleteProductService();
+  public async delete(request: Request, response: Response): Promise<Response> {
+    const { id } = request.params;
+
+    const deleteProductService = container.resolve(DeleteProductService);
+
     await deleteProductService.execute({ id });
-    res.status(204).send([]);
+
+    return response.status(204).send([]);
   }
 }

@@ -46,7 +46,7 @@ class FakeUserRepositories implements IUserRepository {
     throw new Error('Method not implemented.');
   }
 
-  findById(id: number): Promise<IUser | null> {
+  findById(id: string): Promise<IUser | null> {
     throw new Error('Method not implemented.');
   }
 

@@ -11,7 +11,7 @@ import {
 @Entity('products')
 export class Product {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
   @OneToMany(() => OrdersProducts, order_products => order_products.product)
   order_products: OrdersProducts[];

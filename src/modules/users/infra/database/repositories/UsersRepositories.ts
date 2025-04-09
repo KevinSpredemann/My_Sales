@@ -49,7 +49,7 @@ class UserRepository implements IUserRepository {
     return result as IPaginateUser;
   }
 
-  public async findById(id: number): Promise<IUser | null> {
+  public async findById(id: string): Promise<IUser | null> {
     const user = await this.ormRepository.findOneBy({ id });
     return user as IUser;
   }

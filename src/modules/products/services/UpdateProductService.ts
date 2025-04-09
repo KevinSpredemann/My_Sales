@@ -1,43 +1,50 @@
 import AppError from '@shared/errors/AppError';
-import { Product } from '../infra/database/entities/Products';
-import { productRepositories } from '../infra/database/repositories/ProductsRepositories';
 import RedisCache from '@shared/cache/RedisCache';
-
-interface IUpdateProduct {
+import { Product } from '../infra/database/entities/Product';
+import { inject, injectable } from 'tsyringe';
+import { IProductsRepository } from '../domain/repositories/IProductRepository';
+interface IRequest {
   id: string;
   name: string;
   price: number;
   quantity: number;
 }
-export default class UpdateProductService {
-  async execute({
+@injectable()
+class UpdateProductService {
+  constructor(
+    @inject('ProductsRepository')
+    private productsRepository: IProductsRepository,
+  ) {}
+  public async execute({
     id,
     name,
     price,
     quantity,
-  }: IUpdateProduct): Promise<Product> {
-    const redisCache = new RedisCache();
-
-    const product = await productRepositories.findById(id);
+  }: IRequest): Promise<Product> {
+    const product = await this.productsRepository.findById(Number(id));
 
     if (!product) {
-      throw new AppError('Product not found', 404);
+      throw new AppError('Product not found.', 404);
     }
 
-    const productExists = await productRepositories.findByName(name);
+    const productExists = await this.productsRepository.findByName(name);
 
-    if (productExists) {
-      throw new AppError('There is already one product with this name', 409);
+    if (productExists && name !== product.name) {
+      throw new AppError('There is already one product with this name');
     }
+
+    const redisCache = new RedisCache();
+
+    await redisCache.invalidate('api-vendas-PRODUCT_LIST');
 
     product.name = name;
     product.price = price;
     product.quantity = quantity;
 
-    await productRepositories.save(product);
+    await this.productsRepository.save(product as unknown as Product);
 
-    await redisCache.invalidate('products-list');
-
-    return product;
+    return product as unknown as Product;
   }
 }
+
+export default UpdateProductService;
