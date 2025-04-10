@@ -9,9 +9,6 @@ import { ICreateCostumer } from '@modules/costumers/domain/models/ICreateUsers';
 import { Repository } from 'typeorm';
 
 export default class costumerRepository implements ICostumerRepository {
-  static findById(arg0: number) {
-    throw new Error('Method not implemented.');
-  }
   private ormRepository: Repository<Costumer>;
 
   constructor() {

@@ -1,19 +1,26 @@
 import AppError from '@shared/errors/AppError';
-import { Costumer } from '../infra/database/entities/Costumer';
+import { inject, injectable } from 'tsyringe';
+import { IShowCustomer } from '../domain/models/IShowCostumer';
 import { ICostumerRepository } from '../domain/repositories/ICostumersRepositories';
-interface IShowService {
-  id: number;
-}
+import { Costumer } from '../infra/database/entities/Costumer';
 
-export default class ShowCostumerService {
-  constructor(private readonly costumerRepository: ICostumerRepository) {}
-  public async execute({ id }: IShowService): Promise<Costumer> {
-    const costumer = await this.costumerRepository.findById(id);
 
-    if (!costumer) {
-      throw new AppError('Costumer not found', 404);
+@injectable()
+class ShowCustomerService {
+  constructor(
+    @inject('CustomersRepository')
+    private customersRepository: ICostumerRepository,
+  ) {}
+
+  public async execute({ id }: IShowCustomer): Promise<Costumer> {
+    const customer = await this.customersRepository.findById(Number(id));
+
+    if (!customer) {
+      throw new AppError('Customer not found.', 404);
     }
 
-    return costumer;
+    return customer;
   }
 }
+
+export default ShowCustomerService;
